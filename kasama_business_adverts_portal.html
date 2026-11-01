@@ -1,0 +1,614 @@
+<!-- ... existing code ... -->
+                <!-- Desktop Actions -->
+                <div class="hidden md:flex items-center gap-4">
+                    <button onclick="switchTab('listings')" class="text-sm font-semibold text-gray-700 hover:text-brand-600 transition">Browse Ads</button>
+                    <button onclick="switchTab('categories')" class="text-sm font-semibold text-gray-700 hover:text-brand-600 transition">Categories</button>
+                    <!-- Admin Mode Toggle Button -->
+                    <button id="adminToggleBtn" onclick="toggleAdminMode()" class="text-xs font-bold px-3 py-1.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 hover:bg-gray-200 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span id="adminToggleText">Admin Mode: OFF</span>
+                    </button>
+                    <button onclick="openPostModal()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-circle-plus text-base"></i>
+                        <span>Post Free Advert</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Post Button -->
+                <div class="flex md:hidden items-center gap-2">
+                    <button onclick="toggleAdminMode()" class="bg-gray-200 text-gray-800 text-xs font-bold px-2.5 py-1.5 rounded-lg flex items-center gap-1">
+                        <i class="fa-solid fa-user-shield text-xs"></i>
+                        <span id="mobileAdminBadge">Admin</span>
+                    </button>
+                    <button onclick="openPostModal()" class="bg-brand-600 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Post Ad</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Admin Banner & Stats Bar (Visible only when Admin Mode is Active) -->
+    <div id="adminStatsBar" class="hidden bg-slate-900 text-white py-3 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="bg-amber-500 text-slate-950 font-extrabold text-[10px] px-2 py-0.5 rounded uppercase">Owner & Admin Dashboard</span>
+                <span class="text-slate-300">Manage listings live, edit details, or change publication status.</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-300 font-medium">
+                <div>Total Ads: <span id="statTotal" class="text-white font-bold">0</span></div>
+                <div>Featured: <span id="statFeatured" class="text-amber-400 font-bold">0</span></div>
+                <div>Active: <span id="statActive" class="text-emerald-400 font-bold">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero & Search Section -->
+<!-- ... existing code ... -->
+        <!-- Results Summary Bar -->
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <h3 class="text-base md:text-lg font-bold text-gray-900" id="resultsCount">Active Listings</h3>
+                <p class="text-xs text-gray-500" id="activeFilterLabel">Showing all latest adverts in Kasama</p>
+            </div>
+            <button onclick="resetFilters()" class="text-xs text-brand-600 hover:text-brand-800 font-semibold flex items-center gap-1 bg-brand-50 px-2.5 py-1.5 rounded-lg border border-brand-100">
+                <i class="fa-solid fa-rotate-left"></i> Clear Filters
+            </button>
+        </div>
+
+        <!-- Advert Grid -->
+        <div id="listingsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            <!-- Cards rendered by JS -->
+        </div>
+<!-- ... existing code ... -->
+    <!-- Edit Listing Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl my-8">
+            <div class="bg-amber-600 text-white p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-lg"></i>
+                    <h3 class="font-bold text-base">Edit Advert Details</h3>
+                </div>
+                <button onclick="closeEditModal()" class="text-amber-100 hover:text-white">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="adEditForm" onsubmit="handleEditForm(event)" class="p-5 space-y-4">
+                <input type="hidden" id="editId">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Business or Item Title *</label>
+                    <input type="text" required id="editTitle" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Category *</label>
+                        <select required id="editCategory" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Retail">Retail</option>
+                            <option value="Automotive">Automotive</option>
+                            <option value="Services">Services</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Jobs">Jobs</option>
+                            <option value="Electronics">Electronics</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Location Area *</label>
+                        <select required id="editLocation" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="Kasama Central">Kasama Central</option>
+                            <option value="Chikumanino">Chikumanino</option>
+                            <option value="Mbala Road">Mbala Road</option>
+                            <option value="Location Area">Location Area</option>
+                            <option value="Tazara Zone">Tazara Zone</option>
+                            <option value="Lukashya">Lukashya</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Price (ZMW)</label>
+                        <input type="text" id="editPrice" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Phone / WhatsApp *</label>
+                        <input type="tel" required id="editPhone" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Business Name / Advertiser *</label>
+                    <input type="text" required id="editSeller" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Image URL</label>
+                    <input type="url" id="editImage" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Description *</label>
+                    <textarea required id="editDescription" rows="3" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button type="button" onclick="closeEditModal()" class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2.5 rounded-xl text-sm transition">
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-1/2 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl text-sm transition shadow-md">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Initial Mock Listings Data tailored for Kasama
+        const initialListings = [
+            {
+                id: 1,
+                title: "Hybrid Maize Seeds & Fertilizer Supply",
+                category: "Agriculture",
+                location: "Chikumanino",
+                price: "ZMW 580",
+                phone: "260971234567",
+                seller: "Northern Agro Supplies Ltd",
+                image: "https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80",
+                description: "Certified high-yield hybrid maize seeds, D-Compound & Urea fertilizers available in bulk or small bags. Delivery across Kasama district available.",
+                featured: true,
+                status: "Active",
+                date: "Today"
+            },
+            {
+                id: 2,
+                title: "Solar Power Inverter & Panel Installation",
+                category: "Services",
+                location: "Kasama Central",
+                price: "ZMW 3,500",
+                phone: "260965889900",
+                seller: "Kasama Solar Tech",
+                image: "https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=600&q=80",
+                description: "Beat load-shedding! Complete solar systems for homes, shops, and farms. 3kVA - 10kVA setups with lithium batteries.",
+                featured: true,
+                status: "Active",
+                date: "Today"
+            },
+            {
+                id: 3,
+                title: "2-Bedroom House for Rent in Mbala Road",
+                category: "Real Estate",
+                location: "Mbala Road",
+                price: "ZMW 2,200 /mo",
+                phone: "260978112233",
+                seller: "Chileshe Properties",
+                image: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=600&q=80",
+                description: "Spacious self-contained 2-bedroom house, master en-suite, paved yard, motorized gate, and continuous water supply.",
+                featured: false,
+                status: "Active",
+                date: "Yesterday"
+            },
+            {
+                id: 4,
+                title: "Canter Truck Rental for Goods Transport",
+                category: "Automotive",
+                location: "Tazara Zone",
+                price: "Negotiable",
+                phone: "260950334455",
+                seller: "Mwamba Logistics",
+                image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=600&q=80",
+                description: "Reliable Mitsubishi Canter 4-ton truck for local transport within Kasama, Luwingu, Mbala, and Mpika routes.",
+                featured: false,
+                status: "Active",
+                date: "2 days ago"
+            },
+            {
+                id: 5,
+                title: "Brand New Samsung Smart TVs & Phones",
+                category: "Electronics",
+                location: "Kasama Central",
+                price: "ZMW 4,200",
+                phone: "260977665544",
+                seller: "Digital Hub Kasama",
+                image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=600&q=80",
+                description: "Original 43-inch & 55-inch Smart 4K TVs with warranty. Also stocking latest smartphones at competitive prices.",
+                featured: false,
+                status: "Active",
+                date: "3 days ago"
+            },
+            {
+                id: 6,
+                title: "Fresh Farm Eggs & Broiler Chickens",
+                category: "Agriculture",
+                location: "Lukashya",
+                price: "ZMW 75 / tray",
+                phone: "260962111222",
+                seller: "Lukashya Poultry Farm",
+                image: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=600&q=80",
+                description: "Large fresh farm eggs available daily. Wholesale discounts for restaurants, hotels, and boarding schools in Kasama.",
+                featured: false,
+                status: "Active",
+                date: "3 days ago"
+            }
+        ];
+
+        // Load persisted listings from localStorage or fallback to defaults
+        let listings = JSON.parse(localStorage.getItem('kasama_adverts')) || [...initialListings];
+        let isAdminMode = false;
+        let currentCategory = "All";
+
+        // Save listings helper
+        function saveListings() {
+            localStorage.setItem('kasama_adverts', JSON.stringify(listings));
+            updateAdminStats();
+        }
+
+        // Toggle Admin / Owner Mode
+        function toggleAdminMode() {
+            isAdminMode = !isAdminMode;
+            const btnText = document.getElementById('adminToggleText');
+            const btn = document.getElementById('adminToggleBtn');
+            const statsBar = document.getElementById('adminStatsBar');
+            const mobileBadge = document.getElementById('mobileAdminBadge');
+
+            if (isAdminMode) {
+                btnText.textContent = "Admin Mode: ON";
+                btn.classList.replace('bg-gray-100', 'bg-amber-500');
+                btn.classList.replace('text-gray-700', 'text-slate-950');
+                statsBar.classList.remove('hidden');
+                mobileBadge.textContent = "Admin ON";
+                showToast("Switched to Owner/Admin Management Mode");
+            } else {
+                btnText.textContent = "Admin Mode: OFF";
+                btn.classList.replace('bg-amber-500', 'bg-gray-100');
+                btn.classList.replace('text-slate-950', 'text-gray-700');
+                statsBar.classList.add('hidden');
+                mobileBadge.textContent = "Admin";
+                showToast("Switched to Public Visitor View");
+            }
+
+            applyFilters();
+        }
+
+        // Update Admin Dashboard Stats
+        function updateAdminStats() {
+            document.getElementById('statTotal').textContent = listings.length;
+            document.getElementById('statFeatured').textContent = listings.filter(l => l.featured).length;
+            document.getElementById('statActive').textContent = listings.filter(l => l.status !== 'Pending').length;
+        }
+
+        // Category List Setup
+        const categories = [
+            { name: "All", icon: "fa-border-all" },
+            { name: "Agriculture", icon: "fa-wheat-awn" },
+            { name: "Retail", icon: "fa-shop" },
+            { name: "Automotive", icon: "fa-car" },
+            { name: "Services", icon: "fa-screwdriver-wrench" },
+            { name: "Real Estate", icon: "fa-house" },
+            { name: "Jobs", icon: "fa-briefcase" },
+            { name: "Electronics", icon: "fa-laptop" }
+        ];
+
+        // Initialize Page
+        window.onload = function() {
+            renderCategoryPills();
+            saveListings();
+            renderListings(listings);
+        };
+
+        // Render Quick Category Pills
+        function renderCategoryPills() {
+            const container = document.getElementById('categoryPills');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterByCategory('${cat.name}')" 
+                        class="px-3 py-1.5 rounded-full border whitespace-nowrap flex items-center gap-1.5 transition ${currentCategory === cat.name ? 'bg-brand-600 text-white border-brand-600 font-semibold' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200'}">
+                    <i class="fa-solid ${cat.icon}"></i>
+                    <span>${cat.name}</span>
+                </button>
+            `).join('');
+        }
+
+        // Render Advert Cards Grid (with conditional Admin Controls)
+        function renderListings(items) {
+            const grid = document.getElementById('listingsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const countLabel = document.getElementById('resultsCount');
+
+            countLabel.textContent = `${items.length} Active Listing${items.length !== 1 ? 's' : ''}`;
+
+            if (items.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = items.map(item => `
+                <div class="bg-white rounded-2xl border ${item.status === 'Pending' ? 'border-amber-400 bg-amber-50/20' : 'border-gray-200'} overflow-hidden shadow-sm hover:shadow-md transition duration-200 flex flex-col group relative">
+                    <div class="relative h-44 bg-gray-100 overflow-hidden cursor-pointer" onclick="openDetailModal(${item.id})">
+                        <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/16a34a/ffffff?text=Kasama+Advert'">
+                        <span class="absolute top-2.5 left-2.5 bg-brand-700/90 backdrop-blur-md text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                            ${item.category}
+                        </span>
+                        ${item.featured ? '<span class="absolute top-2.5 right-2.5 bg-amber-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md uppercase"><i class="fa-solid fa-star"></i> Featured</span>' : ''}
+                        ${item.status === 'Pending' ? '<span class="absolute bottom-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md uppercase">Pending Review</span>' : ''}
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col justify-between">
+                        <div class="cursor-pointer" onclick="openDetailModal(${item.id})">
+                            <div class="flex items-center gap-1.5 text-[11px] text-gray-500 mb-1">
+                                <i class="fa-solid fa-location-dot text-brand-600"></i>
+                                <span>${item.location}</span>
+                            </div>
+                            <h4 class="font-bold text-gray-900 text-sm line-clamp-2 mb-2 leading-snug group-hover:text-brand-600 transition">
+                                ${item.title}
+                            </h4>
+                        </div>
+
+                        <div>
+                            <p class="text-xs text-gray-500 line-clamp-2 mb-3 leading-relaxed">
+                                ${item.description}
+                            </p>
+                            <div class="pt-2 border-t border-gray-100 flex items-center justify-between">
+                                <span class="font-extrabold text-brand-700 text-base">
+                                    ${item.price}
+                                </span>
+                                <button onclick="openDetailModal(${item.id})" class="text-xs text-brand-600 font-semibold group-hover:underline flex items-center gap-1">
+                                    View <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Action Toolbar (Only rendered when Admin Mode is ON) -->
+                    ${isAdminMode ? `
+                    <div class="bg-slate-900 text-white p-2.5 flex items-center justify-between gap-1 border-t border-slate-800">
+                        <div class="flex items-center gap-1">
+                            <button onclick="toggleFeatured(${item.id})" title="Toggle Featured Status" class="px-2 py-1 text-[11px] rounded ${item.featured ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">
+                                <i class="fa-solid fa-star"></i>
+                            </button>
+                            <button onclick="toggleStatus(${item.id})" title="Toggle Publication Status" class="px-2 py-1 text-[11px] rounded ${item.status === 'Active' ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'} font-bold">
+                                ${item.status || 'Active'}
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="openEditModal(${item.id})" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1">
+                                <i class="fa-solid fa-pen-to-square"></i> Edit
+                            </button>
+                            <button onclick="deleteListing(${item.id})" class="bg-red-600 hover:bg-red-700 text-white text-[11px] font-bold px-2.5 py-1 rounded flex items-center gap-1">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Toggle Featured status (Admin)
+        function toggleFeatured(id) {
+            const index = listings.findIndex(l => l.id === id);
+            if (index !== -1) {
+                listings[index].featured = !listings[index].featured;
+                saveListings();
+                applyFilters();
+                showToast(`Listing "${listings[index].title}" featured status updated!`);
+            }
+        }
+
+        // Toggle Status (Active / Pending)
+        function toggleStatus(id) {
+            const index = listings.findIndex(l => l.id === id);
+            if (index !== -1) {
+                listings[index].status = listings[index].status === 'Active' ? 'Pending' : 'Active';
+                saveListings();
+                applyFilters();
+                showToast(`Listing status updated to ${listings[index].status}`);
+            }
+        }
+
+        // Delete Listing Action
+        function deleteListing(id) {
+            const item = listings.find(l => l.id === id);
+            if (!item) return;
+
+            if (confirm(`Are you sure you want to delete "${item.title}"? This action cannot be undone.`)) {
+                listings = listings.filter(l => l.id !== id);
+                saveListings();
+                applyFilters();
+                showToast("Listing deleted successfully.");
+            }
+        }
+
+        // Open Pre-filled Edit Modal
+        function openEditModal(id) {
+            const item = listings.find(l => l.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('editTitle').value = item.title;
+            document.getElementById('editCategory').value = item.category;
+            document.getElementById('editLocation').value = item.location;
+            document.getElementById('editPrice').value = item.price.replace('ZMW ', '');
+            document.getElementById('editPhone').value = item.phone;
+            document.getElementById('editSeller').value = item.seller;
+            document.getElementById('editImage').value = item.image;
+            document.getElementById('editDescription').value = item.description;
+
+            document.getElementById('editModal').classList.remove('hidden');
+            document.getElementById('editModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Save Edits to State and localStorage
+        function handleEditForm(e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('editId').value);
+            const index = listings.findIndex(l => l.id === id);
+
+            if (index !== -1) {
+                listings[index].title = document.getElementById('editTitle').value;
+                listings[index].category = document.getElementById('editCategory').value;
+                listings[index].location = document.getElementById('editLocation').value;
+                listings[index].price = document.getElementById('editPrice').value ? `ZMW ${document.getElementById('editPrice').value}` : 'Negotiable';
+                listings[index].phone = document.getElementById('editPhone').value;
+                listings[index].seller = document.getElementById('editSeller').value;
+                listings[index].image = document.getElementById('editImage').value || listings[index].image;
+                listings[index].description = document.getElementById('editDescription').value;
+
+                saveListings();
+                closeEditModal();
+                applyFilters();
+                showToast("Listing changes saved successfully!");
+            }
+        }
+
+        // Apply Search & Filters
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const location = document.getElementById('locationFilter').value;
+
+            currentCategory = category;
+            renderCategoryPills();
+
+            const filtered = listings.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(query) || 
+                                      item.description.toLowerCase().includes(query) ||
+                                      item.seller.toLowerCase().includes(query);
+                const matchesCategory = category === "All" || item.category === category;
+                const matchesLocation = location === "All" || item.location === location;
+
+                return matchesSearch && matchesCategory && matchesLocation;
+            });
+
+            // Update Label
+            const label = document.getElementById('activeFilterLabel');
+            let labelText = "Showing filtered results";
+            if(category !== "All") labelText += ` in ${category}`;
+            if(location !== "All") labelText += ` around ${location}`;
+            label.textContent = labelText;
+
+            renderListings(filtered);
+        }
+
+        // Quick Category Filter from Pills
+        function filterByCategory(catName) {
+            document.getElementById('categoryFilter').value = catName;
+            applyFilters();
+        }
+
+        // Quick Area Filter
+        function filterByArea(areaName) {
+            document.getElementById('locationFilter').value = areaName;
+            applyFilters();
+        }
+
+        // Reset Filters
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = 'All';
+            document.getElementById('locationFilter').value = 'All';
+            currentCategory = 'All';
+            renderCategoryPills();
+            document.getElementById('activeFilterLabel').textContent = "Showing all latest adverts in Kasama";
+            renderListings(listings);
+        }
+
+        // Open Detail Modal
+        function openDetailModal(id) {
+            const item = listings.find(l => l.id === id);
+            if (!item) return;
+
+            document.getElementById('modalImage').src = item.image;
+            document.getElementById('modalTitle').textContent = item.title;
+            document.getElementById('modalPrice').textContent = item.price;
+            document.getElementById('modalCategory').textContent = item.category;
+            document.getElementById('modalLocation').textContent = item.location;
+            document.getElementById('modalDate').textContent = item.date || 'Recently';
+            document.getElementById('modalDescription').textContent = item.description;
+            document.getElementById('modalSeller').textContent = item.seller;
+
+            // Direct WhatsApp & Phone links
+            const cleanPhone = item.phone.replace(/[^0-9]/g, '');
+            const waMessage = encodeURIComponent(`Hello ${item.seller}, I saw your advert "${item.title}" on Kasama Business Adverts. Is it still available?`);
+            
+            document.getElementById('whatsappBtn').href = `https://wa.me/${cleanPhone}?text=${waMessage}`;
+            document.getElementById('callBtn').href = `tel:+${cleanPhone}`;
+
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.getElementById('detailModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.getElementById('detailModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Post Modal Functions
+        function openPostModal() {
+            document.getElementById('postModal').classList.remove('hidden');
+            document.getElementById('postModal').classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePostModal() {
+            document.getElementById('postModal').classList.add('hidden');
+            document.getElementById('postModal').classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Handle User Ad Submission
+        function handlePostForm(e) {
+            e.preventDefault();
+
+            const newAd = {
+                id: Date.now(),
+                title: document.getElementById('postTitle').value,
+                category: document.getElementById('postCategory').value,
+                location: document.getElementById('postLocation').value,
+                price: document.getElementById('postPrice').value ? `ZMW ${document.getElementById('postPrice').value}` : 'Negotiable',
+                phone: document.getElementById('postPhone').value,
+                seller: document.getElementById('postSeller').value,
+                description: document.getElementById('postDescription').value,
+                image: "https://images.unsplash.com/photo-1556742049-0a67daf4005a?auto=format&fit=crop&w=600&q=80",
+                featured: false,
+                status: "Active",
+                date: "Just Now"
+            };
+
+            // Prepend new listing and persist
+            listings.unshift(newAd);
+            saveListings();
+            closePostModal();
+            document.getElementById('adPostForm').reset();
+            resetFilters();
+
+            // Show Toast
+            showToast("Your business advert has been published successfully!");
+        }
+
+        // Toast Notification Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
